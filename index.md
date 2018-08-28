@@ -1,37 +1,54 @@
-## Welcome to GitHub Pages
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta content="telephone=no" name="format-detection" />
+    <title>测试</title>
+</head>
+<body>
+<video id="video" width="320" height="240" autoplay></video>
+<button id="snap">拍摄</button>
+<canvas id="canvas" width="320" height="240"></canvas>
+<script>
+    window.addEventListener("DOMContentLoaded", function() {
+        var canvas = document.getElementById("canvas"),//调用canvas接口
+                context = canvas.getContext("2d"),
+                video = document.getElementById("video"),
+                videoObj = { "video": true },
+                errBack = function(error) {//错误处理
+                    console.log("Video capture error: ", error.code);
+                };
+        if(navigator.getUserMedia) {//调用html5拍摄接口
+            navigator.getUserMedia(videoObj, function(stream) {
+                video.src = stream;//摄像机属于视频流，所以当然要输出到html5的video标签中了
+                video.play();//开始播放
+            }, errBack);
+        } else if(navigator.webkitGetUserMedia) { //WebKit内核调用html5拍摄接口
+            navigator.webkitGetUserMedia(videoObj, function(stream){
+                video.src = window.webkitURL.createObjectURL(stream);//同上
+                video.play();//同上
+            }, errBack);
+        }
+        else if(navigator.mozGetUserMedia) { //moz内核调用html5拍摄接口
+            navigator.mozGetUserMedia(videoObj, function(stream){
+                video.src = window.URL.createObjectURL(stream);//同上
+                video.play();//同上
+            }, errBack);
+        }
+    }, false);
 
-You can use the [editor on GitHub](https://github.com/websiteWY/ss/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+    document.getElementById("snap")
+            .addEventListener("click", function() {//获取拍照按钮绑定事件
+                var canvans = document.getElementById("canvas"),//调用canvas接口
+                        context = canvas.getContext("2d");
+                context.drawImage(video, 0, 0, 640, 480);//调用canvas接口的drawImage方法绘制当前video标签中的静态图片，其实就是截图
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/websiteWY/ss/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+                var imgData = canvans.toDataURL();//获取图片的base64格式的数据
+                //这里就可以写上传服务器代码了
+            });
+</script>
+</body>
+</html>
